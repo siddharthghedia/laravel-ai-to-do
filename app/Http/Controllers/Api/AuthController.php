@@ -74,13 +74,13 @@ class AuthController extends Controller
             }
 
             // Check if email is verified
-            if (! $user->hasVerifiedEmail()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please verify your email before logging in.',
-                    'email_verified' => false,
-                ], 403);
-            }
+            // if (! $user->hasVerifiedEmail()) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Please verify your email before logging in.',
+            //         'email_verified' => false,
+            //     ], 403);
+            // }
 
             // Create access token using Laravel Sanctum
             $token = $user->createToken('auth_token')->plainTextToken;
