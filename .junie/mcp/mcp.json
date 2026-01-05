@@ -1,0 +1,20 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/Users/siddharth/Library/Application Support/Herd/bin/php83",
+            "args": [
+                "/Users/siddharth/code/laravel-ai-to-do/artisan",
+                "boost:mcp"
+            ]
+        },
+        "herd": {
+            "command": "/Users/siddharth/Library/Application Support/Herd/bin/php83",
+            "args": [
+                "/Applications/Herd.app/Contents/Resources/herd-mcp.phar"
+            ],
+            "env": {
+                "SITE_PATH": "/Users/siddharth/code/laravel-ai-to-do"
+            }
+        }
+    }
+}
