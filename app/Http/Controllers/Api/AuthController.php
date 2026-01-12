@@ -8,6 +8,7 @@ use App\Http\Requests\Api\RegisterRequest;
 use App\Models\User;
 use App\Notifications\EmailVerificationOtpNotification;
 use App\Services\UserService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,8 @@ class AuthController extends Controller
     {
         try {
             $user = $this->userService->saveUser($request->validated());
+
+            event(new Registered($user));
 
             // Generate a 6-digit OTP
             $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
