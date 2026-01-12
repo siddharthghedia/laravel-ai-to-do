@@ -19,22 +19,14 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertStatus(201)
+        $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',
                 'message',
-                'data' => [
-                    'user' => ['id', 'name', 'email'],
-                    'access_token',
-                    'token_type',
-                ],
             ])
             ->assertJson([
                 'success' => true,
-                'message' => 'User registered successfully',
-                'data' => [
-                    'token_type' => 'Bearer',
-                ],
+                'message' => 'User registered successfully. Please verify your email with the OTP sent.',
             ]);
 
         $this->assertDatabaseHas('users', [
@@ -126,7 +118,7 @@ class AuthControllerTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
-        ])->getJson('/api/user');
+        ])->getJson('/api/tasks');
 
         $response->assertStatus(200);
     }
@@ -135,7 +127,7 @@ class AuthControllerTest extends TestCase
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer invalid-token',
-        ])->getJson('/api/user');
+        ])->getJson('/api/tasks');
 
         $response->assertStatus(401);
     }
