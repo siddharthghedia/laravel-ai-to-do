@@ -170,6 +170,30 @@ class AuthController extends Controller
     }
 
     /**
+     * Get the authenticated user's profile.
+     */
+    public function profile(): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User profile retrieved successfully',
+                'data' => [
+                    'user' => $user,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve profile. Please try again.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+    }
+
+    /**
      * Logout user (Revoke current access token).
      */
     public function logout(): JsonResponse
