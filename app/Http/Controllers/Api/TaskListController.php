@@ -66,11 +66,20 @@ class TaskListController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(TaskList $taskList)
     {
-        //
+        if ($taskList->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $taskList->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task list soft deleted successfully',
+        ]);
     }
 }
