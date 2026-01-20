@@ -21,6 +21,11 @@ class Task extends Model
         'status',
     ];
 
+    protected $casts = [
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+    ];
+
     public function taskList()
     {
         return $this->belongsTo(TaskList::class);
