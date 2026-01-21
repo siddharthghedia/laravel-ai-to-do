@@ -14,6 +14,7 @@ Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'profile']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
     
     Route::apiResource('task-lists', TaskListController::class);
