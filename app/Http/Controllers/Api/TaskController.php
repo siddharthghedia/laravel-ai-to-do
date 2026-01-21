@@ -33,13 +33,7 @@ class TaskController extends Controller
             $query->onlyTrashed();
         }
 
-        $tasks = $query->get()->map(function ($task) {
-            $task->attachments->map(function ($attachment) {
-                $attachment->url = Storage::url($attachment->file_path);
-                return $attachment;
-            });
-            return $task;
-        });
+        $tasks = $query->get();
 
         return response()->json($tasks);
     }
@@ -100,12 +94,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $task->load('attachments');
-        $task->attachments->map(function ($attachment) {
-            $attachment->url = Storage::url($attachment->file_path);
-            return $attachment;
-        });
-        return response()->json($task);
+        return response()->json($task->load('attachments'));
     }
 
     /**

@@ -53,7 +53,12 @@ class TaskApiTest extends TestCase
             ->assertJsonPath('title', 'Design Meeting')
             ->assertJsonPath('start_time', '10:00')
             ->assertJsonPath('end_time', '11:00')
-            ->assertJsonCount(2, 'attachments');
+            ->assertJsonCount(2, 'attachments')
+            ->assertJsonStructure([
+                'attachments' => [
+                    '*' => ['url', 'file_name']
+                ]
+            ]);
 
         $this->assertDatabaseHas('tasks', ['title' => 'Design Meeting']);
         $this->assertDatabaseHas('task_attachments', ['file_name' => 'design1.jpg']);
