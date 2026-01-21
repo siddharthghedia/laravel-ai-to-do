@@ -60,6 +60,11 @@ class TaskApiTest extends TestCase
                 ]
             ]);
 
+        $attachmentUrl1 = $response->json('attachments.0.url');
+        $attachmentUrl2 = $response->json('attachments.1.url');
+        $this->assertStringStartsWith('http', $attachmentUrl1);
+        $this->assertStringStartsWith('http', $attachmentUrl2);
+
         $this->assertDatabaseHas('tasks', ['title' => 'Design Meeting']);
         $this->assertDatabaseHas('task_attachments', ['file_name' => 'design1.jpg']);
     }
