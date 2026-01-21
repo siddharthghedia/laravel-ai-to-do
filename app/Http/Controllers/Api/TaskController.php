@@ -67,7 +67,7 @@ class TaskController extends Controller
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
             'frequency' => 'nullable|in:none,daily,weekly,monthly,yearly',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
         $task = Task::create($validated);
@@ -131,7 +131,7 @@ class TaskController extends Controller
             'end_time' => 'nullable|date_format:H:i',
             'frequency' => 'nullable|in:none,daily,weekly,monthly,yearly',
             'status' => 'sometimes|in:open,closed',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
         $task->update($validated);
