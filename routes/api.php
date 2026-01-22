@@ -19,5 +19,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::apiResource('task-lists', TaskListController::class);
     Route::apiResource('tasks', TaskController::class);
+    Route::post('tasks/reorder', [TaskController::class, 'reorder']);
     Route::post('tasks/{id}/restore', [TaskController::class, 'restore']);
 });

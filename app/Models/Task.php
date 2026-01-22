@@ -19,6 +19,7 @@ class Task extends Model
         'end_time',
         'frequency',
         'status',
+        'position',
     ];
 
     protected $casts = [

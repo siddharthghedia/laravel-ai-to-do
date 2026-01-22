@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\TaskList;
 use App\Models\TaskAttachment;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
@@ -19,7 +20,9 @@ class TaskController extends Controller
         $query = Task::with('attachments')
             ->whereHas('taskList', function ($q) {
                 $q->where('user_id', auth()->id());
-            });
+            })
+            ->orderBy('position', 'asc')
+            ->orderBy('id', 'desc');
 
         if ($request->has('task_list_id')) {
             $query->where('task_list_id', $request->task_list_id);
@@ -176,5 +179,35 @@ class TaskController extends Controller
         $task->restore();
 
         return response()->json($task->load('attachments'));
+    }
+
+    /**
+     * Reorder tasks.
+     */
+    public function reorder(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'task_ids' => 'required|array',
+            'task_ids.*' => 'exists:tasks,id',
+        ]);
+
+        $taskIds = $validated['task_ids'];
+
+        // Verify all tasks belong to the authenticated user
+        foreach ($taskIds as $id) {
+            $task = Task::find($id);
+            if ($task->taskList->user_id !== auth()->id()) {
+                return response()->json(['message' => 'Unauthorized Access to Task ID: ' . $id], 403);
+            }
+        }
+
+        foreach ($taskIds as $index => $id) {
+            Task::where('id', $id)->update(['position' => $index]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tasks reordered successfully.',
+        ], 200);
     }
 }
