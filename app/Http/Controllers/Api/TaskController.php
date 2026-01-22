@@ -193,12 +193,18 @@ class TaskController extends Controller
 
         $taskIds = $validated['task_ids'];
 
-        // Verify all tasks belong to the authenticated user
-        foreach ($taskIds as $id) {
-            $task = Task::find($id);
-            if ($task->taskList->user_id !== auth()->id()) {
-                return response()->json(['message' => 'Unauthorized Access to Task ID: ' . $id], 403);
-            }
+        // Verify all tasks belong to the authenticated user in one query
+        $ownedTasksCount = Task::whereIn('id', $taskIds)
+            ->whereHas('taskList', function ($q) {
+                $q->where('user_id', auth()->id());
+            })
+            ->count();
+
+        if ($ownedTasksCount !== count($taskIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access or invalid task IDs provided.',
+            ], 403);
         }
 
         foreach ($taskIds as $index => $id) {
