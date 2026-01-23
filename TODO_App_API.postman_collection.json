@@ -353,6 +353,51 @@
                     }
                 },
                 {
+                    "name": "Search Tasks",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tasks/search?q=milk&task_list_id=1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tasks",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "milk",
+                                    "description": "The search query string"
+                                },
+                                {
+                                    "key": "task_list_id",
+                                    "value": "1",
+                                    "description": "Optional: ID of the task list to search within"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
                     "name": "Create Task (with Form Data for Images)",
                     "request": {
                         "auth": {

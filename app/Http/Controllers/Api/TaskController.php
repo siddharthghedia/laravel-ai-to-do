@@ -183,6 +183,45 @@ class TaskController extends Controller
     }
 
     /**
+     * Search for tasks.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $request->validate([
+            'q' => 'required|string|min:1',
+            'task_list_id' => [
+                'sometimes',
+                'exists:task_lists,id',
+                function ($attribute, $value, $fail) {
+                    if (!TaskList::where('id', $value)->where('user_id', auth()->id())->exists()) {
+                        $fail('The selected task list does not belong to you.');
+                    }
+                },
+            ],
+        ]);
+
+        $query = $request->input('q');
+        $taskListId = $request->input('task_list_id');
+
+        $tasks = Task::with('attachments')
+            ->whereHas('taskList', function ($q) use ($taskListId) {
+                $q->where('user_id', auth()->id());
+                if ($taskListId) {
+                    $q->where('id', $taskListId);
+                }
+            })
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%");
+            })
+            ->orderBy('position', 'asc')
+            ->orderBy('id', 'desc')
+            ->paginate($request->input('per_page', 15));
+
+        return response()->json($tasks);
+    }
+
+    /**
      * Reorder tasks.
      */
     public function reorder(Request $request): JsonResponse
