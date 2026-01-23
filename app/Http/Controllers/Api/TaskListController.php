@@ -63,7 +63,22 @@ class TaskListController extends Controller
      */
     public function update(Request $request, TaskList $taskList)
     {
-        //
+        if ($taskList->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $taskList->update([
+            'name' => $validated['name'],
+        ]);
+
+        return response()->json($taskList);
     }
 
     public function destroy(TaskList $taskList)
