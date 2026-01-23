@@ -81,12 +81,14 @@ class TaskApiTest extends TestCase
         $response = $this->getJson("/api/tasks?task_list_id={$taskList->id}");
 
         $response->assertStatus(200)
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.attachments.0.file_name', 'image.jpg')
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.attachments.0.file_name', 'image.jpg')
             ->assertJsonStructure([
-                '*' => [
-                    'attachments' => [
-                        '*' => ['url', 'file_name']
+                'data' => [
+                    '*' => [
+                        'attachments' => [
+                            '*' => ['url', 'file_name']
+                        ]
                     ]
                 ]
             ]);
@@ -118,8 +120,8 @@ class TaskApiTest extends TestCase
         $response = $this->getJson("/api/tasks?archived=true");
 
         $response->assertStatus(200)
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.title', 'Archived Task');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Archived Task');
     }
 
     public function test_user_can_restore_archived_task()
@@ -198,7 +200,40 @@ class TaskApiTest extends TestCase
         // Test Tasks Index
         $this->getJson('/api/tasks')
             ->assertStatus(200)
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.title', 'User 2 Task');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'User 2 Task');
+    }
+
+    public function test_tasks_index_is_paginated()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $taskList = TaskList::create(['name' => 'Work', 'user_id' => $user->id]);
+        
+        // Create 20 tasks
+        for ($i = 1; $i <= 20; $i++) {
+            $taskList->tasks()->create(['title' => "Task $i"]);
+        }
+
+        // Test default pagination (15 per page)
+        $response = $this->getJson('/api/tasks');
+        $response->assertStatus(200)
+            ->assertJsonCount(15, 'data')
+            ->assertJsonPath('total', 20)
+            ->assertJsonPath('per_page', 15)
+            ->assertJsonPath('current_page', 1);
+
+        // Test custom per_page
+        $response = $this->getJson('/api/tasks?per_page=5');
+        $response->assertStatus(200)
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('per_page', 5);
+
+        // Test second page
+        $response = $this->getJson('/api/tasks?page=2&per_page=15');
+        $response->assertStatus(200)
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('current_page', 2);
     }
 }

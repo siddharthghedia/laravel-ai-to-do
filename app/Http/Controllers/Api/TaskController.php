@@ -36,7 +36,8 @@ class TaskController extends Controller
             $query->onlyTrashed();
         }
 
-        $tasks = $query->get();
+        $perPage = $request->input('per_page', 15);
+        $tasks = $query->paginate($perPage);
 
         return response()->json($tasks);
     }
