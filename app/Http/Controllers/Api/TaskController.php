@@ -21,20 +21,17 @@ class TaskController extends Controller
             ->whereHas('taskList', function ($q) {
                 $q->where('user_id', auth()->id());
             })
-            ->orderBy('position', 'asc')
-            ->orderBy('id', 'desc');
+            ->when($request->has('task_list_id'), function ($q) use ($request) {
+                $q->where('task_list_id', $request->task_list_id);
+            })
+            ->when($request->has('status'), function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->when($request->has('archived') && $request->archived == 'true', function ($q) {
+                $q->onlyTrashed();
+            });
 
-        if ($request->has('task_list_id')) {
-            $query->where('task_list_id', $request->task_list_id);
-        }
-
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('archived') && $request->archived == 'true') {
-            $query->onlyTrashed();
-        }
+        $this->applySorting($query, $request);
 
         $perPage = $request->input('per_page', 15);
         $tasks = $query->paginate($perPage);
@@ -200,25 +197,41 @@ class TaskController extends Controller
             ],
         ]);
 
-        $query = $request->input('q');
+        $queryStr = $request->input('q');
         $taskListId = $request->input('task_list_id');
 
-        $tasks = Task::with('attachments')
+        $query = Task::with('attachments')
             ->whereHas('taskList', function ($q) use ($taskListId) {
                 $q->where('user_id', auth()->id());
                 if ($taskListId) {
                     $q->where('id', $taskListId);
                 }
             })
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%");
-            })
-            ->orderBy('position', 'asc')
-            ->orderBy('id', 'desc')
-            ->paginate($request->input('per_page', 15));
+            ->where(function ($q) use ($queryStr) {
+                $q->where('title', 'like', "%{$queryStr}%")
+                    ->orWhere('description', 'like', "%{$queryStr}%");
+            });
 
-        return response()->json($tasks);
+        $this->applySorting($query, $request);
+
+        return response()->json($query->paginate($request->input('per_page', 15)));
+    }
+
+    /**
+     * Apply sorting to the query.
+     */
+    private function applySorting($query, $request)
+    {
+        $sortBy = $request->input('sort_by');
+        $sortOrder = $request->input('sort_order', 'asc');
+
+        if ($sortBy && in_array($sortBy, ['title', 'due_date', 'start_time', 'description'])) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            // Default sorting
+            $query->orderBy('position', 'asc')
+                ->orderBy('id', 'desc');
+        }
     }
 
     /**

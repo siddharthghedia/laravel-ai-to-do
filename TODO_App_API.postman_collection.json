@@ -347,6 +347,16 @@
                                 {
                                     "key": "archived",
                                     "value": "false"
+                                },
+                                {
+                                    "key": "sort_by",
+                                    "value": "due_date",
+                                    "description": "Optional: title, due_date, start_time, description"
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "asc",
+                                    "description": "Optional: asc, desc"
                                 }
                             ]
                         }
@@ -392,6 +402,16 @@
                                     "key": "task_list_id",
                                     "value": "1",
                                     "description": "Optional: ID of the task list to search within"
+                                },
+                                {
+                                    "key": "sort_by",
+                                    "value": "title",
+                                    "description": "Optional: title, due_date, start_time, description"
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "asc",
+                                    "description": "Optional: asc, desc"
                                 }
                             ]
                         }

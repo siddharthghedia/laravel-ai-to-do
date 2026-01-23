@@ -236,4 +236,36 @@ class TaskApiTest extends TestCase
             ->assertJsonCount(5, 'data')
             ->assertJsonPath('current_page', 2);
     }
+
+    public function test_tasks_index_can_be_sorted()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $taskList = TaskList::create(['name' => 'Work', 'user_id' => $user->id]);
+        $taskList->tasks()->create(['title' => 'B Task', 'due_date' => '2026-01-22', 'start_time' => '10:00']);
+        $taskList->tasks()->create(['title' => 'A Task', 'due_date' => '2026-01-21', 'start_time' => '09:00']);
+        $taskList->tasks()->create(['title' => 'C Task', 'due_date' => '2026-01-23', 'start_time' => '11:00']);
+
+        // Test sort by title asc
+        $response = $this->getJson('/api/tasks?sort_by=title&sort_order=asc');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.title', 'A Task')
+            ->assertJsonPath('data.1.title', 'B Task')
+            ->assertJsonPath('data.2.title', 'C Task');
+
+        // Test sort by due_date desc
+        $response = $this->getJson('/api/tasks?sort_by=due_date&sort_order=desc');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.title', 'C Task')
+            ->assertJsonPath('data.1.title', 'B Task')
+            ->assertJsonPath('data.2.title', 'A Task');
+            
+        // Test sort by start_time asc
+        $response = $this->getJson('/api/tasks?sort_by=start_time&sort_order=asc');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.start_time', '09:00')
+            ->assertJsonPath('data.1.start_time', '10:00')
+            ->assertJsonPath('data.2.start_time', '11:00');
+    }
 }

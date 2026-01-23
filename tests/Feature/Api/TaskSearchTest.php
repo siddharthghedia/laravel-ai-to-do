@@ -125,4 +125,26 @@ class TaskSearchTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['q']);
     }
+
+    public function test_search_results_can_be_sorted()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $taskList = TaskList::create(['name' => 'Work', 'user_id' => $user->id]);
+        $taskList->tasks()->create(['title' => 'Alpha Task', 'due_date' => '2026-01-21']);
+        $taskList->tasks()->create(['title' => 'Beta Task', 'due_date' => '2026-01-20']);
+
+        // Search for 'Task' and sort by title desc
+        $response = $this->getJson('/api/tasks/search?q=Task&sort_by=title&sort_order=desc');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.title', 'Beta Task')
+            ->assertJsonPath('data.1.title', 'Alpha Task');
+
+        // Search for 'Task' and sort by due_date asc
+        $response = $this->getJson('/api/tasks/search?q=Task&sort_by=due_date&sort_order=asc');
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.title', 'Beta Task')
+            ->assertJsonPath('data.1.title', 'Alpha Task');
+    }
 }
