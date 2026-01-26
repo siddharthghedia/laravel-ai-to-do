@@ -269,4 +269,18 @@ class TaskController extends Controller
             'message' => 'Tasks reordered successfully.',
         ], 200);
     }
+
+    /**
+     * Mark the specified task as complete.
+     */
+    public function complete(Task $task): JsonResponse
+    {
+        if ($task->taskList->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $task->update(['status' => 'closed']);
+
+        return response()->json($task->load('attachments'));
+    }
 }
