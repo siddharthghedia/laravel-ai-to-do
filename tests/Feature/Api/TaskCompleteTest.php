@@ -59,4 +59,27 @@ class TaskCompleteTest extends TestCase
             'status' => 'open'
         ]);
     }
+
+    public function test_user_can_reopen_own_task()
+    {
+        $user = User::factory()->create();
+        $taskList = TaskList::create([
+            'user_id' => $user->id,
+            'name' => 'My Tasks'
+        ]);
+        $task = Task::create([
+            'task_list_id' => $taskList->id,
+            'title' => 'Test Task',
+            'status' => 'closed'
+        ]);
+
+        $response = $this->actingAs($user)
+            ->postJson("/api/tasks/{$task->id}/open");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+            'status' => 'open'
+        ]);
+    }
 }

@@ -689,6 +689,40 @@
                     }
                 },
                 {
+                    "name": "Reopen Task",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tasks/1/open",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tasks",
+                                "1",
+                                "open"
+                            ]
+                        }
+                    }
+                },
+                {
                     "name": "Archive Task (Delete)",
                     "request": {
                         "auth": {

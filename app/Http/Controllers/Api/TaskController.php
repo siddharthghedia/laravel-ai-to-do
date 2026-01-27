@@ -283,4 +283,18 @@ class TaskController extends Controller
 
         return response()->json($task->load('attachments'));
     }
+
+    /**
+     * Mark the specified task as open.
+     */
+    public function open(Task $task): JsonResponse
+    {
+        if ($task->taskList->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $task->update(['status' => 'open']);
+
+        return response()->json($task->load('attachments'));
+    }
 }

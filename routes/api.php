@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('tasks/search', [TaskController::class, 'search']);
     Route::apiResource('tasks', TaskController::class);
     Route::post('tasks/{task}/complete', [TaskController::class, 'complete']);
+    Route::post('tasks/{task}/open', [TaskController::class, 'open']);
     Route::post('tasks/reorder', [TaskController::class, 'reorder']);
     Route::post('tasks/{id}/restore', [TaskController::class, 'restore']);
 });
