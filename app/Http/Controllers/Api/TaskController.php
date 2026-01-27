@@ -132,10 +132,23 @@ class TaskController extends Controller
             'end_time' => 'nullable|date_format:H:i',
             'frequency' => 'nullable|in:none,daily,weekly,monthly,yearly',
             'status' => 'sometimes|in:open,closed',
+            'remove_attachment_ids' => 'nullable|array',
+            'remove_attachment_ids.*' => 'exists:task_attachments,id',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
         $task->update($validated);
+
+        if ($request->has('remove_attachment_ids')) {
+            $attachmentsToRemove = $task->attachments()
+                ->whereIn('id', $request->input('remove_attachment_ids'))
+                ->get();
+
+            foreach ($attachmentsToRemove as $attachment) {
+                Storage::disk('public')->delete($attachment->file_path);
+                $attachment->delete();
+            }
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {

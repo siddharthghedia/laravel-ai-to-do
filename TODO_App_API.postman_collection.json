@@ -634,7 +634,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"title\": \"Updated Design Meeting\",\n    \"status\": \"closed\"\n}",
+                            "raw": "{\n    \"title\": \"Updated Design Meeting\",\n    \"status\": \"closed\",\n    \"remove_attachment_ids\": [1, 2]\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
