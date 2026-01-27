@@ -115,6 +115,14 @@ class TaskController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        // Convert "null" strings to actual null values
+        $input = $request->all();
+        foreach ($input as $key => $value) {
+            if ($value === 'null') {
+                $request->merge([$key => null]);
+            }
+        }
+
         $validated = $request->validate([
             'task_list_id' => [
                 'sometimes',

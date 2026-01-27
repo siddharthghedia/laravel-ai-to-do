@@ -625,7 +625,7 @@
                                 }
                             ]
                         },
-                        "method": "PUT",
+                        "method": "POST",
                         "header": [
                             {
                                 "key": "Accept",
@@ -633,13 +633,25 @@
                             }
                         ],
                         "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"title\": \"Updated Design Meeting\",\n    \"status\": \"closed\",\n    \"remove_attachment_ids\": [1, 2]\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "title",
+                                    "value": "Updated Design Meeting",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "closed",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "due_date",
+                                    "value": "null",
+                                    "description": "Send 'null' string to clear the date",
+                                    "type": "text"
                                 }
-                            }
+                            ]
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/tasks/1",

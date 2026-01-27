@@ -99,4 +99,32 @@ class TaskUpdateDebugTest extends TestCase
         // Assert file is deleted from storage
         Storage::disk('public')->assertMissing('task_attachments/test.jpg');
     }
+
+    public function test_can_update_with_post_multipart_and_null_strings()
+    {
+        $user = User::factory()->create();
+        $taskList = TaskList::create(['user_id' => $user->id, 'name' => 'My Tasks']);
+        $task = Task::create([
+            'task_list_id' => $taskList->id,
+            'title' => 'Test Task',
+            'due_date' => '2023-01-01',
+        ]);
+
+        // Attempt to update due_date with POST (mimicking FormData) and "null" string
+        $response = $this->actingAs($user)
+            ->post("/api/tasks/{$task->id}", [
+                'due_date' => 'null', 
+                '_method' => 'POST' // Explicitly ensuring it's POST (though post() helper does this)
+            ]);
+        
+        $response->assertStatus(200);
+        
+        $task->refresh();
+        
+        if ($task->due_date === null) {
+            $this->assertTrue(true, "POST update with 'null' string worked.");
+        } else {
+            $this->assertTrue(false, "POST update failed to clear due_date. Current value: " . $task->due_date);
+        }
+    }
 }

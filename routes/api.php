@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('task-lists', TaskListController::class);
     Route::get('tasks/search', [TaskController::class, 'search']);
     Route::apiResource('tasks', TaskController::class);
+    Route::post('tasks/{task}', [TaskController::class, 'update']);
     Route::post('tasks/{task}/complete', [TaskController::class, 'complete']);
     Route::post('tasks/{task}/open', [TaskController::class, 'open']);
     Route::post('tasks/reorder', [TaskController::class, 'reorder']);
